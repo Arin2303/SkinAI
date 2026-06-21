@@ -1,0 +1,82 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="card" style="background: #fff; padding: 30px; border-radius: 16px; border: 1px solid rgba(0,0,0,0.03);">
+    <h2 style="color: #2c3e35; margin-bottom: 30px; margin-top: 0;">📖 Panduan Penggunaan & Alur Kerja</h2>
+
+    <!-- ALUR KERJA (FLOWCHART TEKS YANG LEBIH DETAIL) -->
+    <div class="workflow-section" style="margin-bottom: 40px;">
+        <h3 style="color: #708238; font-size: 18px; margin-bottom: 20px;">Alur Kerja Sistem</h3>
+        <div style="display: flex; flex-direction: column; gap: 15px;">
+            
+            <!-- LANGKAH 1 -->
+            <div style="display: flex; align-items: flex-start; gap: 15px;">
+                <div style="background: #708238; color: white; width: 30px; height: 30px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: bold; flex-shrink: 0;">1</div>
+                <div>
+                    <p style="margin: 0; color: #2c3e35; font-weight: 600;">Scan Wajah (Pemindai Kulit)</p>
+                    <p style="margin: 5px 0 0 0; color: #6b7c74; font-size: 13px; line-height: 1.5;">
+                        Buka menu "Pemindai Kulit". Pastikan wajah Anda berada tepat di dalam bingkai oval yang muncul di layar. Gunakan pencahayaan yang cukup agar AI dapat mendeteksi tekstur kulit dengan akurasi tinggi.
+                    </p>
+                </div>
+            </div>
+            
+            <div style="margin-left: 15px; border-left: 2px dashed #c27d66; padding-left: 25px; height: 20px;"></div>
+            
+            <!-- LANGKAH 2 -->
+            <div style="display: flex; align-items: flex-start; gap: 15px;">
+                <div style="background: #c27d66; color: white; width: 30px; height: 30px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: bold; flex-shrink: 0;">2</div>
+                <div>
+                    <p style="margin: 0; color: #2c3e35; font-weight: 600;">Analisis & Jurnal Pemindaian</p>
+                    <p style="margin: 5px 0 0 0; color: #6b7c74; font-size: 13px; line-height: 1.5;">
+                        Tunggu beberapa detik hingga proses pemrosesan AI selesai. Sistem akan menampilkan persentase tipe kulit Anda (Oily, Dry, Normal, atau Combination) secara otomatis pada tabel riwayat di bawah dashboard.
+                    </p>
+                </div>
+            </div>
+            
+            <div style="margin-left: 15px; border-left: 2px dashed #c27d66; padding-left: 25px; height: 20px;"></div>
+            
+            <!-- LANGKAH 3 -->
+            <div style="display: flex; align-items: flex-start; gap: 15px;">
+                <div style="background: #708238; color: white; width: 30px; height: 30px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: bold; flex-shrink: 0;">3</div>
+                <div>
+                    <p style="margin: 0; color: #2c3e35; font-weight: 600;">Aksi Lanjutan</p>
+                    <p style="margin: 5px 0 0 0; color: #6b7c74; font-size: 13px; line-height: 1.5;">
+                        Klik tombol <b>"Produk"</b> untuk melihat rekomendasi item perawatan yang sesuai dengan tipe kulit Anda, atau klik <b>"Rutinitas"</b> untuk mendapatkan panduan penggunaan skincare langkah demi langkah.
+                    </p>
+                </div>
+            </div>
+            
+        </div>
+    </div>
+
+    <hr style="border: 0; border-top: 1px solid #e3e8e5; margin: 30px 0;">
+
+    <!-- FAQ -->
+    <h3 style="color: #2c3e35; font-size: 18px; margin-bottom: 20px;">Pertanyaan Umum (FAQ)</h3>
+    
+    <div class="faq-item" style="margin-bottom: 25px;">
+        <h4 style="color: #708238; margin: 0 0 8px 0; font-size: 15px;">Bagaimana cara memastikan hasil scan akurat?</h4>
+        <p style="color: #6b7c74; font-size: 14px; margin: 0;">Pastikan wajah menghadap langsung ke kamera dengan pencahayaan yang cukup terang (tidak membelakangi cahaya) agar pori dan tekstur kulit terbaca dengan jelas oleh AI.</p>
+    </div>
+
+    <div class="faq-item" style="margin-bottom: 25px;">
+        <h4 style="color: #708238; margin: 0 0 8px 0; font-size: 15px;">Apakah hasil analisis ini mutlak?</h4>
+        <p style="color: #6b7c74; font-size: 14px; margin: 0;">Sistem ini adalah asisten pendukung berbasis AI. Untuk kondisi medis kulit yang serius atau alergi berat, sangat disarankan untuk berkonsultasi langsung ke dermatologis.</p>
+    </div>
+
+    <div class="faq-item" style="margin-bottom: 25px;">
+        <h4 style="color: #708238; margin: 0 0 8px 0; font-size: 15px;">Apa arti persentase pada hasil kulit saya?</h4>
+        <p style="color: #6b7c74; font-size: 14px; margin: 0;">Persentase menunjukkan dominasi karakteristik kulit Anda pada saat itu. Jika Oily 60% dan Dry 40%, artinya kulit Anda cenderung kombinasi yang lebih berminyak.</p>
+    </div>
+
+    <div class="faq-item" style="margin-bottom: 25px;">
+        <h4 style="color: #708238; margin: 0 0 8px 0; font-size: 15px;">Apakah aplikasi ini menyimpan foto wajah saya?</h4>
+        <p style="color: #6b7c74; font-size: 14px; margin: 0;">Tidak. Semua proses pemindaian dilakukan secara real-time dan privasi Anda terjaga. Gambar wajah tidak disimpan ke database kami setelah proses analisis selesai.</p>
+    </div>
+
+    <div class="faq-item" style="margin-bottom: 25px;">
+        <h4 style="color: #708238; margin: 0 0 8px 0; font-size: 15px;">Bolehkah saya menggunakan fitur produk tanpa scan?</h4>
+        <p style="color: #6b7c74; font-size: 14px; margin: 0;">Anda tetap bisa mengakses halaman edukasi, namun rekomendasi produk yang paling akurat hanya muncul setelah Anda melakukan pemindaian agar sistem bisa mencocokkan produk dengan kebutuhan kulit Anda saat ini.</p>
+    </div>
+</div>
+{% endblock %}

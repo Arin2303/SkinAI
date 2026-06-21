@@ -1,0 +1,84 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="dashboard-wrapper" style="display: flex; flex-direction: column; gap: 25px;">
+    
+    <div id="locked-state" class="card" style="display: none; background: #ffffff; border: 1px solid rgba(0,0,0,0.03); padding: 40px; border-radius: 16px; max-width: 600px; margin: 40px auto; text-align: center;">
+        <div style="font-size: 50px; margin-bottom: 15px;">🔒</div>
+        <h3 style="color: #c27d66; font-weight: 700; margin-top: 0;">Fitur Belum Terbuka</h3>
+        <p style="font-size: 14px; color: #666; line-height: 1.6; margin-bottom: 25px;">
+            Silakan lakukan analisis wajah atau mengisi kuesioner terlebih dahulu di menu <b>Pemindai Kulit</b> agar sistem AI dapat meracik rekomendasi tipe produk yang aman dan sesuai untukmu!
+        </p>
+        <a href="/" style="display: inline-block; background: #708238; color: white; text-decoration: none; padding: 12px 25px; font-weight: 600; border-radius: 8px; font-size: 14px; transition: background 0.2s;">
+            Mulai Pemindaian Kulit
+        </a>
+    </div>
+
+    <div id="unlocked-state" style="display: none; flex-direction: column; gap: 25px;">
+        
+        <div class="card" style="background: #ffffff; border: 1px solid rgba(0,0,0,0.03); padding: 25px; border-radius: 16px; text-align: center;">
+            <p style="margin: 0; font-size: 13px; color: #708238; font-weight: 600; letter-spacing: 1px; text-transform: uppercase;">Panduan Belanja Khusus</p>
+            <h2 id="skin-type-subtitle" style="margin: 5px 0 0 0; color: #c27d66; font-weight: 800; font-size: 28px;">-</h2>
+        </div>
+
+        <div id="product-grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 25px;">
+        </div>
+
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+    const lockedState = document.getElementById("locked-state");
+    const unlockedState = document.getElementById("unlocked-state");
+    const skinTypeSubtitle = document.getElementById("skin-type-subtitle");
+    const productGrid = document.getElementById("product-grid");
+
+    // 1. Tangkap parameter dari URL (Contoh: /rekomendasi?skin_type=Oily)
+    const urlParams = new URLSearchParams(window.location.search);
+    const skinTypeQuery = urlParams.get('skin_type');
+    
+    // 2. Siapkan URL API dengan parameter jika ada
+    let apiUrl = '/api/guide/get-rekomendasi';
+    if (skinTypeQuery) {
+        apiUrl += '?type=' + encodeURIComponent(skinTypeQuery);
+    }
+
+    // 3. Ambil data dari API
+    fetch(apiUrl)
+        .then(response => response.json())
+        .then(res => {
+            if (res.status === "locked") {
+                lockedState.style.display = "block";
+                unlockedState.style.display = "none";
+            } else if (res.status === "success") {
+                lockedState.style.display = "none";
+                unlockedState.style.display = "flex";
+                skinTypeSubtitle.textContent = `Rekomendasi Tipe Produk: ${res.skin_type}`;
+
+                productGrid.innerHTML = "";
+
+                res.produk.forEach(prod => {
+                    productGrid.innerHTML += `
+                        <div class="card" style="background: #ffffff; border: 1px solid rgba(0,0,0,0.03); padding: 25px; border-radius: 16px; display: flex; flex-direction: column; gap: 12px; box-shadow: 0 2px 6px rgba(0,0,0,0.01);">
+                            <div style="font-size: 32px;">${prod.icon}</div>
+                            <h4 style="margin: 0; color: #708238; font-weight: 700; font-size: 16px;">${prod.kategori}</h4>
+                            <div style="background: #f4f6f0; color: #708238; padding: 4px 8px; border-radius: 6px; font-weight: 600; font-size: 11px; align-self: flex-start; text-transform: uppercase; letter-spacing: 0.5px;">
+                                Tekstur: ${prod.tekstur}
+                            </div>
+                            <p style="margin: 5px 0 0 0; font-size: 13px; color: #666; line-height: 1.5;">
+                                ${prod.penjelasan}
+                            </p>
+                        </div>
+                    `;
+                });
+            }
+        })
+        .catch(err => {
+            console.error("Gagal memuat data rekomendasi produk:", err);
+        });
+});
+</script>
+{% endblock %}

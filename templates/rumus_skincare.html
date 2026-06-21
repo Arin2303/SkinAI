@@ -1,0 +1,202 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="dashboard-wrapper" style="display: flex; flex-direction: column; gap: 25px; padding: 20px;">
+    
+    <div id="locked-state" class="card" style="display: none; background: #ffffff; border: 1px solid rgba(0,0,0,0.03); padding: 40px; border-radius: 16px; max-width: 600px; margin: 40px auto; text-align: center;">
+        <div style="font-size: 50px; margin-bottom: 15px;">🔒</div>
+        <h3 style="color: #c27d66; font-weight: 700; margin-top: 0;">Fitur Belum Terbuka</h3>
+        <p style="font-size: 14px; color: #666; line-height: 1.6; margin-bottom: 25px;">
+            Silakan lakukan analisis wajah atau mengisi kuesioner terlebih dahulu di menu <b>Pemindai Kulit</b> agar sistem AI dapat meracik rumus khusus sesuai kondisi real wajahmu!
+        </p>
+        <a href="/" style="display: inline-block; background: #708238; color: white; text-decoration: none; padding: 12px 25px; font-weight: 600; border-radius: 8px; font-size: 14px; transition: background 0.2s;">
+            Mulai Pemindaian Kulit
+        </a>
+    </div>
+
+    <div id="unlocked-state" style="display: none; flex-direction: column; gap: 25px;">
+        
+        <div class="card" style="background: #ffffff; border: 1px solid rgba(0,0,0,0.03); padding: 25px; border-radius: 16px; text-align: center;">
+            <p style="margin: 0; font-size: 13px; color: #708238; font-weight: 600; letter-spacing: 1px; text-transform: uppercase;">Kondisi Akhir Akumulasi</p>
+            <h2 id="skin-type-title" style="margin: 5px 0 0 0; color: #c27d66; font-weight: 800; font-size: 28px;">-</h2>
+        </div>
+
+        <div style="display: flex; gap: 10px; border-bottom: 2px solid #f4f6f0; padding-bottom: 2px;">
+            <button id="btn-tab-harian" onclick="switchTab('harian')" style="background: none; border: none; padding: 10px 20px; font-size: 15px; font-weight: 700; color: #708238; border-bottom: 3px solid #708238; cursor: pointer; transition: all 0.2s;">
+                ☀️/🌙 Urutan Harian
+            </button>
+            <button id="btn-tab-mingguan" onclick="switchTab('mingguan')" style="background: none; border: none; padding: 10px 20px; font-size: 15px; font-weight: 600; color: #888; border-bottom: 3px solid transparent; cursor: pointer; transition: all 0.2s;">
+                📅 Jadwal Mingguan
+            </button>
+        </div>
+
+        <div id="content-tab-harian" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 25px;">
+            
+            <div class="card" style="background: #ffffff; border: 1px solid rgba(0,0,0,0.03); padding: 25px; border-radius: 16px; display: flex; flex-direction: column;">
+                <h4 style="color: #708238; margin-top: 0; border-bottom: 2px solid #f4f6f0; padding-bottom: 10px; font-weight: 700; margin-bottom: 10px;">☀️ Rumus Pagi (AM Routine)</h4>
+                
+                <div style="background: #f4f6f0; padding: 12px; border-radius: 8px; margin-bottom: 15px;">
+                    <span style="font-size: 11px; font-weight: bold; color: #708238; text-transform: uppercase; display: block; margin-bottom: 4px;">🔄 Alur Ringkas Pemakaian:</span>
+                    <p id="urutan-pagi-text" style="margin: 0; font-size: 12.5px; color: #4f5d27; font-weight: 600; line-height: 1.4;">-</p>
+                </div>
+
+                <div id="pagi-routine-list" style="display: flex; flex-direction: column; gap: 15px;"></div>
+            </div>
+
+            <div class="card" style="background: #ffffff; border: 1px solid rgba(0,0,0,0.03); padding: 25px; border-radius: 16px; display: flex; flex-direction: column;">
+                <h4 style="color: #c27d66; margin-top: 0; border-bottom: 2px solid #f5eadd; padding-bottom: 10px; font-weight: 700; margin-bottom: 10px;">🌙 Rumus Malam (PM Routine)</h4>
+                
+                <div style="background: #f5eadd; padding: 12px; border-radius: 8px; margin-bottom: 15px;">
+                    <span style="font-size: 11px; font-weight: bold; color: #c27d66; text-transform: uppercase; display: block; margin-bottom: 4px;">🔄 Alur Ringkas Pemakaian:</span>
+                    <p id="urutan-malam-text" style="margin: 0; font-size: 12.5px; color: #94533d; font-weight: 600; line-height: 1.4;">-</p>
+                </div>
+
+                <div id="malam-routine-list" style="display: flex; flex-direction: column; gap: 15px;"></div>
+            </div>
+        </div>
+
+        <div id="content-tab-mingguan" class="card" style="display: none; background: #ffffff; border: 1px solid rgba(0,0,0,0.03); padding: 25px; border-radius: 16px;">
+            <h4 style="color: #708238; margin-top: 0; font-weight: 700; margin-bottom: 5px;">📅 Jadwal Rumus Mingguan</h4>
+            <p style="font-size: 13px; color: #708238; margin-bottom: 20px;">Variasi perawatan malam hari agar performa kandungan aktif bekerja maksimal tanpa mengiritasi wajah.</p>
+            
+            <div style="overflow-x: auto;">
+                <table style="width: 100%; border-collapse: collapse; font-size: 14px; text-align: left;">
+                    <thead>
+                        <tr style="background: #f4f6f0; color: #708238; border-bottom: 2px solid #e3e8e5;">
+                            <th style="padding: 12px 15px; font-weight: 700;">Hari</th>
+                            <th style="padding: 12px 15px; font-weight: 700;">Fokus Perawatan</th>
+                            <th style="padding: 12px 15px; font-weight: 700;">Detail Instruksi Rumus Aktif</th>
+                        </tr>
+                    </thead>
+                    <tbody id="weekly-table-body"></tbody>
+                </table>
+            </div>
+        </div>
+
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+function switchTab(tabName) {
+    const tabHarianBtn = document.getElementById("btn-tab-harian");
+    const tabMingguanBtn = document.getElementById("btn-tab-mingguan");
+    const contentHarian = document.getElementById("content-tab-harian");
+    const contentMingguan = document.getElementById("content-tab-mingguan");
+
+    if (tabName === "harian") {
+        tabHarianBtn.style.color = "#708238";
+        tabHarianBtn.style.borderBottom = "3px solid #708238";
+        tabHarianBtn.style.fontWeight = "700";
+
+        tabMingguanBtn.style.color = "#888";
+        tabMingguanBtn.style.borderBottom = "3px solid transparent";
+        tabMingguanBtn.style.fontWeight = "600";
+
+        contentHarian.style.display = "grid";
+        contentMingguan.style.display = "none";
+    } else {
+        tabMingguanBtn.style.color = "#708238";
+        tabMingguanBtn.style.borderBottom = "3px solid #708238";
+        tabMingguanBtn.style.fontWeight = "700";
+
+        tabHarianBtn.style.color = "#888";
+        tabHarianBtn.style.borderBottom = "3px solid transparent";
+        tabHarianBtn.style.fontWeight = "600";
+
+        contentHarian.style.display = "none";
+        contentMingguan.style.display = "block";
+    }
+}
+
+document.addEventListener("DOMContentLoaded", function () {
+    const lockedState = document.getElementById("locked-state");
+    const unlockedState = document.getElementById("unlocked-state");
+    const skinTypeTitle = document.getElementById("skin-type-title");
+    const urutanPagiText = document.getElementById("urutan-pagi-text");
+    const urutanMalamText = document.getElementById("urutan-malam-text");
+    const pagiList = document.getElementById("pagi-routine-list");
+    const malamList = document.getElementById("malam-routine-list");
+    const weeklyTableBody = document.getElementById("weekly-table-body");
+
+    // TANGKAP SHORTCUT JURNAL DARI URL
+    const urlParams = new URLSearchParams(window.location.search);
+    const skinTypeQuery = urlParams.get('skin_type');
+    
+    // Siapkan URL API
+    let apiUrl = '/api/guide/get-rumus';
+    if (skinTypeQuery) {
+        apiUrl += '?type=' + encodeURIComponent(skinTypeQuery);
+    }
+
+    // Mengambil data dari endpoint API Flask
+    fetch(apiUrl)
+        .then(response => response.json())
+        .then(res => {
+            if (res.status === "locked") {
+                lockedState.style.display = "block";
+                unlockedState.style.display = "none";
+            } else if (res.status === "success") {
+                lockedState.style.display = "none";
+                unlockedState.style.display = "flex";
+                skinTypeTitle.textContent = res.skin_type;
+
+                // Memasukkan teks alur urutan makro dari backend
+                urutanPagiText.textContent = res.urutan_pagi || "-";
+                urutanMalamText.textContent = res.urutan_malam || "-";
+
+                // 1. Render Rutinitas Pagi
+                pagiList.innerHTML = "";
+                res.pagi.forEach(item => {
+                    pagiList.innerHTML += `
+                        <div style="display: flex; gap: 12px; align-items: flex-start;">
+                            <span style="background: #f4f6f0; color: #708238; font-weight: bold; width: 24px; height: 24px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 12px; flex-shrink: 0; margin-top: 2px;">${item.step}</span>
+                            <div>
+                                <h5 style="margin: 0; font-weight: 600; color: #333; font-size: 14px;">${item.item}</h5>
+                                <p style="margin: 2px 0 0 0; font-size: 12.5px; color: #666; line-height: 1.4;">${item.desc}</p>
+                            </div>
+                        </div>
+                    `;
+                });
+
+                // 2. Render Rutinitas Malam
+                malamList.innerHTML = "";
+                res.malam.forEach(item => {
+                    malamList.innerHTML += `
+                        <div style="display: flex; gap: 12px; align-items: flex-start;">
+                            <span style="background: #f5eadd; color: #c27d66; font-weight: bold; width: 24px; height: 24px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 12px; flex-shrink: 0; margin-top: 2px;">${item.step}</span>
+                            <div>
+                                <h5 style="margin: 0; font-weight: 600; color: #333; font-size: 14px;">${item.item}</h5>
+                                <p style="margin: 2px 0 0 0; font-size: 12.5px; color: #666; line-height: 1.4;">${item.desc}</p>
+                            </div>
+                        </div>
+                    `;
+                });
+
+                // 3. Render Jadwal Mingguan
+                weeklyTableBody.innerHTML = "";
+                for (const [hari, detailHari] of Object.entries(res.mingguan)) {
+                    const isExfo = detailHari.tipe.includes("Eksfoliasi") || detailHari.tipe.includes("Peeling") || detailHari.tipe.includes("Anti-Aging");
+                    const badgeStyle = isExfo 
+                        ? "background: #f5eadd; color: #c27d66; padding: 4px 10px; border-radius: 6px; font-weight: 600; font-size: 12px;" 
+                        : "background: #f4f6f0; color: #708238; padding: 4px 10px; border-radius: 6px; font-weight: 600; font-size: 12px;";
+
+                    weeklyTableBody.innerHTML += `
+                        <tr style="border-bottom: 1px solid #eee;">
+                            <td style="padding: 15px; font-weight: 600; color: #333;">${hari}</td>
+                            <td style="padding: 15px;"><span style="${badgeStyle}">${detailHari.tipe}</span></td>
+                            <td style="padding: 15px; color: #555; line-height: 1.4;">${detailHari.detail}</td>
+                        </tr>
+                    `;
+                }
+            }
+        })
+        .catch(err => {
+            console.error("Gagal memuat data rumus:", err);
+            lockedState.style.display = "block";
+            unlockedState.style.display = "none";
+        });
+});
+</script>
+{% endblock %}

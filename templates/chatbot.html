@@ -1,0 +1,125 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="dashboard-wrapper" style="display: flex; flex-direction: column; gap: 25px;">
+    
+    <div class="card" style="background: #ffffff; border: 1px solid rgba(0,0,0,0.03); padding: 25px; border-radius: 16px; max-width: 800px; margin: 0 auto; width: 100%;">
+        <h3 style="color: #c27d66; margin-top: 0; font-weight: 700;"><span style="margin-right: 8px;">💬</span>Konsultasi Asisten SkinAI</h3>
+        <p style="font-size: 13.5px; color: #666; line-height: 1.6; margin-bottom: 20px;">
+            Tanyakan apa saja seputar masalah kulit, urutan penggunaan skincare, atau fungsi kandungan aktif formula.
+        </p>
+
+        <div id="skinai-chat-box" style="display: flex; flex-direction: column; gap: 15px; min-height: 350px; max-height: 450px; overflow-y: auto; border: 1px solid #f5f5f5; padding: 15px; border-radius: 12px; background: #fafafa; margin-bottom: 20px;">
+            <div style="display: flex; justify-content: flex-start; margin-bottom: 15px; width: 100%;">
+                <div style="background: #f4f6f0; color: #2c3e35; border: 1px solid #e3e8e5; padding: 12px 18px; max-width: 70%; font-size: 14px; line-height: 1.5; border-radius: 16px 16px 16px 0px;">
+                    Halo! Ada yang bisa saya bantu mengenai kesehatan kulit wajahmu hari ini?
+                </div>
+            </div>
+        </div>
+
+        <div style="display: flex; gap: 12px; align-items: center; width: 100%;">
+            <input type="text" id="skinai-chat-input" placeholder="Ketik pesan Anda di sini..." style="flex: 1; padding: 14px 20px; border: 1px solid #ddd; border-radius: 10px; font-size: 14px; outline: none; transition: border-color 0.2s;">
+            <button type="button" id="skinai-send-btn" style="background: #c27d66; color: white; border: none; padding: 14px 30px; font-weight: 600; border-radius: 10px; cursor: pointer; font-size: 14px; transition: background 0.2s;">Kirim</button>
+        </div>
+    </div>
+
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="{{ url_for('static', filename='js/scanner.js') }}"></script>
+
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+    const chatInput = document.getElementById("skinai-chat-input");
+    const sendButton = document.getElementById("skinai-send-btn");
+    const chatContainer = document.getElementById("skinai-chat-box");
+
+    if (!chatInput || !sendButton || !chatContainer) {
+        console.error("Elemen Chatbot bermasalah, periksa kembali ID HTML Anda.");
+        return;
+    }
+
+    function appendMessage(text, isUser = false) {
+        const messageWrapper = document.createElement("div");
+        messageWrapper.style.display = "flex";
+        messageWrapper.style.justifyContent = isUser ? "flex-end" : "flex-start";
+        messageWrapper.style.marginBottom = "15px";
+        messageWrapper.style.width = "100%";
+
+        const messageBubble = document.createElement("div");
+        messageBubble.textContent = text;
+        
+        if (isUser) {
+            // REVISI: Bubble chat user menggunakan Hijau Sage
+            messageBubble.style.background = "#708238";
+            messageBubble.style.color = "white";
+            messageBubble.style.borderRadius = "16px 16px 0px 16px";
+        } else {
+            // REVISI: Bubble chat AI/Bot menggunakan Soft Sage-Light dengan border netral
+            messageBubble.style.background = "#f4f6f0";
+            messageBubble.style.color = "#2c3e35";
+            messageBubble.style.border = "1px solid #e3e8e5";
+            messageBubble.style.borderRadius = "16px 16px 16px 0px";
+        }
+        
+        messageBubble.style.padding = "12px 18px";
+        messageBubble.style.maxWidth = "70%";
+        messageBubble.style.fontSize = "14px";
+        messageBubble.style.lineHeight = "1.5";
+        messageBubble.style.wordBreak = "break-word";
+
+        messageWrapper.appendChild(messageBubble);
+        chatContainer.appendChild(messageWrapper);
+        chatContainer.scrollTop = chatContainer.scrollHeight;
+        return messageWrapper;
+    }
+
+    async function sendMessage() {
+        const messageText = chatInput.value.trim();
+        if (!messageText) return;
+
+        appendMessage(messageText, true);
+        chatInput.value = "";
+
+        const typingIndicator = appendMessage("SkinAI sedang mengetik...", false);
+
+        try {
+            const response = await fetch("/api/chatbot/chat", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify({ message: messageText }),
+            });
+
+            if (!response.ok) {
+                throw new Error("HTTP error " + response.status);
+            }
+
+            const data = await response.json();
+            typingIndicator.remove();
+            appendMessage(data.reply, false);
+
+        } catch (error) {
+            console.error("Fetch Error:", error);
+            typingIndicator.remove();
+            appendMessage("Maaf, koneksi ke modul asisten SkinAI terputus. Silakan coba kembali.", false);
+        }
+    }
+
+    sendButton.addEventListener("click", function (e) {
+        e.preventDefault();
+        sendMessage();
+    });
+
+    chatInput.addEventListener("keypress", function (e) {
+        if (e.key === "Enter") {
+            e.preventDefault();
+            sendMessage();
+        }
+    });
+});
+</script>
+{% endblock %}

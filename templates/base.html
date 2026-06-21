@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SkinLogic-AI - Sistem Analisis Karakteristik Kulit</title>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        /* PALET WARNA THE CLEAN APOTHECARY (SAGE, CLAY, & WHITE) */
+        :root {
+            --sage-primary: #708238;    /* Hijau Sage Redup (Warna Utama Premium) */
+            --sage-light: #f4f6f0;      /* Hijau Sage Sangat Muda (Latar Belakang Soft) */
+            --clay-accent: #c27d66;     /* Terakota Halus / Clay (Aksen Kontras Elegan) */
+            --text-dark: #2c3e35;        /* Teks Utama Gelap Berunsur Hijau Organik */
+            --text-muted: #6b7c74;      /* Teks Sekunder / Redup */
+            --white-clean: #ffffff;      /* Putih Bersih */
+            --border-line: #e3e8e5;      /* Garis Batas / Border Tipis */
+        }
+
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background-color: var(--sage-light);
+            margin: 0;
+            padding: 0;
+            color: var(--text-dark);
+            display: flex;
+        }
+
+        /* ------------------ SIDEBAR TEMA CLEAN APOTHECARY ------------------ */
+        .sidebar {
+            width: 260px;
+            height: 100vh;
+            background: var(--white-clean);
+            border-right: 1px solid var(--border-line);
+            position: fixed;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            box-sizing: border-box;
+            z-index: 100;
+        }
+
+        .sidebar-top {
+            padding: 30px 24px;
+        }
+
+        /* BRANDING BARU: SkinLogic-AI */
+        .logo-brand {
+            font-size: 22px;
+            font-weight: 800;
+            color: var(--sage-primary);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 40px;
+            text-decoration: none;
+        }
+
+        .menu-list {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .menu-item a {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            padding: 14px 18px;
+            color: var(--text-muted);
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 14px;
+            border-radius: 12px;
+            transition: all 0.2s ease;
+        }
+
+        .menu-item a:hover {
+            background: var(--sage-light);
+            color: var(--sage-primary);
+        }
+
+        /* STATUS MENU AKTIF (TEMA HIJAU SAGE DENGAN SHADOW LEMBUT) */
+        .menu-item.active a {
+            background: var(--sage-primary);
+            color: var(--white-clean);
+            box-shadow: 0 4px 12px rgba(112, 130, 56, 0.2);
+        }
+
+        /* ------------------ FOOTER SIDEBAR (OWNER KELOMPOK 5) ------------------ */
+        .sidebar-footer {
+            padding: 24px;
+            border-top: 1px solid var(--border-line);
+            background: #fafbfa;
+        }
+
+        .owner-info {
+            font-size: 13px;
+            font-weight: 700;
+            color: var(--sage-primary);
+            margin: 0 0 4px 0;
+        }
+
+        .owner-sub {
+            font-size: 11px;
+            color: var(--text-muted);
+            margin: 0;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        /* ------------------ KONTEN UTAMA ------------------ */
+        .main-content {
+            margin-left: 260px;
+            padding: 40px;
+            width: calc(100% - 260px);
+            min-height: 100vh;
+            box-sizing: border-box;
+        }
+
+        footer.web-footer {
+            text-align: center;
+            padding: 30px 0 10px 0;
+            font-size: 12px;
+            color: var(--text-muted);
+            border-top: 1px solid var(--border-line);
+            margin-top: 40px;
+        }
+    </style>
+    {% block head %}{% endblock %}
+</head>
+<body>
+
+    <div class="sidebar">
+        <div class="sidebar-top">
+            <a href="/" class="logo-brand">
+                <span>🌿</span> SkinLogic–AI
+            </a>
+            
+            <ul class="menu-list">
+                <li class="menu-item {{ 'active' if request.path == '/' }}">
+                    <a href="/">
+                        <span>📷</span> Pemindai Kulit
+                    </a>
+                </li>
+                
+                <li class="menu-item {{ 'active' if request.path == '/rumus-skincare' }}">
+                    <a href="/rumus-skincare">
+                        <span>🧪</span> Rumus Skincare
+                    </a>
+                </li>
+                
+                <li class="menu-item {{ 'active' if request.path == '/rekomendasi-produk' }}">
+                    <a href="/rekomendasi-produk">
+                        <span>🧴</span> Rekomendasi Produk
+                    </a>
+                </li>
+                
+                <li class="menu-item {{ 'active' if request.path == '/assistant' }}">
+                    <a href="/assistant">
+                        <span>💬</span> Asisten AI Chat
+                    </a>
+                </li>
+                
+                <!-- PERBAIKAN: Mengarah ke /edukasi-kulit -->
+                <li class="menu-item {{ 'active' if request.path == '/edukasi-kulit' }}">
+                    <a href="/edukasi-kulit">
+                        <span>📚</span> Edukasi Kulit
+                    </a>
+                </li>
+                
+                <li class="menu-item {{ 'active' if request.path == '/panduan' }}">
+                    <a href="/panduan">
+                        <span>❓</span> Panduan & FAQ
+                    </a>
+                </li>
+                
+                <li class="menu-item {{ 'active' if request.path == '/tentang' }}">
+                    <a href="/tentang">
+                        <span>ℹ️</span> Tentang Aplikasi
+                    </a>
+                </li>
+            </ul>
+        </div>
+
+        <div class="sidebar-footer">
+            <p class="owner-info">Kelompok 5</p>
+            <p class="owner-sub">N TI REG BJM</p>
+        </div>
+    </div>
+
+    <div class="main-content">
+        {% block content %}{% endblock %}
+        
+        <footer class="web-footer">
+            &copy; 2026 <b>SkinLogic-AI</b> | Kelompok 5 - N TI Reg BJM. All Rights Reserved.
+        </footer>
+    </div>
+
+    {% block scripts %}{% endblock %}
+</body>
+</html>

@@ -1,0 +1,121 @@
+{% extends "base.html" %}
+
+{% block content %}
+<style>
+    /* Menyembunyikan masker oval ketika kelas .hide-oval aktif di .camera-wrapper */
+    .camera-wrapper.hide-oval .oval-mask {
+        display: none !important;
+    }
+    
+    /* Efek opsional: Mengubah warna border menjadi hijau penanda sukses analisis */
+    .camera-wrapper.success-scan .oval-mask {
+        border-color: #56cc9d !important;
+    }
+
+    /* Efek Animasi Muncul Lembut untuk Jendela Notifikasi */
+    @keyframes modalFadeIn {
+        from { opacity: 0; transform: scale(0.95); }
+        to { opacity: 1; transform: scale(1); }
+    }
+</style>
+
+<div class="dashboard-wrapper" style="display: flex; flex-direction: column; gap: 25px; position: relative;">
+    
+    <div id="notif-modal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(27, 36, 32, 0.5); z-index: 9999; align-items: center; justify-content: center; backdrop-filter: blur(2px);">
+        <div style="background: #ffffff; padding: 35px 30px; border-radius: 16px; max-width: 440px; width: 90%; position: relative; box-shadow: 0 10px 30px rgba(0,0,0,0.08); text-align: center; border: 1px solid #e3e8e5; animation: modalFadeIn 0.3s ease-out;">
+            
+            <button onclick="closeNotifModal()" style="position: absolute; top: 15px; right: 20px; background: none; border: none; font-size: 24px; cursor: pointer; color: #6b7c74; font-weight: 500; line-height: 1; padding: 0; transition: color 0.2s;">&times;</button>
+            
+            <div style="font-size: 42px; margin-bottom: 15px; line-height: 1;">🎉</div>
+            <h3 style="color: #708238; margin: 0 0 12px 0; font-weight: 700; font-size: 20px;">Analisis Wajah Selesai!</h3>
+            <p style="font-size: 13.5px; color: #6b7c74; line-height: 1.6; margin: 0;">
+                Sistem AI berhasil mendeteksi dan mengunci profil karakteristik wajah Anda. Anda kini dapat melihat <b>Rumus Skincare</b> harian beserta <b>Rekomendasi Tipe Produk</b> khusus yang telah terbuka di menu sidebar.
+            </p>
+        </div>
+    </div>
+    <div class="dashboard-top-row" style="display: flex; gap: 25px; flex-wrap: wrap; width: 100%;">
+        
+        <div class="card camera-section" style="flex: 1; min-width: 400px; background: #fff; padding: 25px; border-radius: 16px; border: 1px solid rgba(0,0,0,0.03); text-align: center;">
+            <div class="camera-wrapper" style="position: relative; width: 400px; height: 300px; margin: 0 auto 20px auto; border-radius: 12px; overflow: hidden; background: #1b2420;">
+                <video id="camera" width="400" height="300" autoplay playsinline style="width: 100%; height: 100%; object-fit: cover; transform: scaleX(-1);"></video>
+                <img id="photo-frozen" style="position: absolute; top:0; left:0; width:100%; height:100%; object-fit:cover; display:none;">
+                
+                <div class="oval-mask" style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 200px; height: 260px; border: 3px dashed #c27d66; border-radius: 100px / 130px; box-shadow: 0 0 0 9999px rgba(27, 36, 32, 0.7); pointer-events: none; transition: border-color 0.3s ease;"></div>
+                
+                <div id="scanner-laser"></div>
+            </div>
+            
+            <canvas id="canvas" width="400" height="300" style="display: none;"></canvas>
+            
+            <div class="action-buttons" style="display: flex; gap: 10px; justify-content: center;">
+                <button id="capture" style="background: #708238; color: white; border: none; padding: 12px 25px; font-weight: 600; border-radius: 8px; cursor: pointer; transition: background 0.2s ease;">Mulai Analisis Kulit</button>
+                <button id="btn-choose-file" style="background: #f0f3f1; color: #4e5e56; border: none; padding: 12px 20px; font-weight: 500; border-radius: 8px; cursor: pointer;">Unggah Galeri</button>
+                <input type="file" id="file-input" accept="image/*" style="display: none;">
+            </div>
+
+            <ul id="scores-list" style="list-style: none; padding: 0; margin-top: 15px;"></ul>
+        </div>
+
+        <div id="quiz-container" style="flex: 1; min-width: 350px; background: #ffffff; border: 2px solid #e3e8e5; padding: 25px; border-radius: 16px; box-shadow: 0 4px 15px rgba(0,0,0,0.01); display: flex; flex-direction: column; justify-content: center; transition: border-color 0.3s ease;">
+            <h3 style="color: #c27d66; margin-top: 0; font-weight: 700; text-align: center;">🎯 Langkah Validasi Akhir</h3>
+            
+            <p id="quiz-intro-text" style="font-size: 13.5px; color: #6b7c74; text-align: center; line-height: 1.6; margin: 0 auto; max-width: 320px;">
+                Silakan lakukan pemindaian wajah atau unggah foto terlebih dahulu di samping agar sistem AI dapat merekam matriks visual awal kulit Anda.
+            </p>
+            
+            <div id="quiz-content" style="display: none;">
+                <h4 id="quiz-question" style="color: #2c3e35; margin-bottom: 18px; line-height: 1.5; font-weight: 600;">Memuat pertanyaan...</h4>
+                <div id="quiz-options" style="display: flex; flex-direction: column; gap: 10px;"></div>
+            </div>
+            
+            <div id="quiz-footer" style="margin-top: 20px; display: none; justify-content: space-between; align-items: center; font-size: 12px; color: #888;">
+                <span id="quiz-progress">Pertanyaan 1 dari 5</span>
+            </div>
+        </div>
+
+    </div>
+
+    <div class="dashboard-bottom-row" style="width: 100%;">
+        <div class="card result-section" style="background: #fff; padding: 25px; border-radius: 16px; border: 1px solid rgba(0,0,0,0.03);">
+            <h3 style="margin-top: 0; color: #2c3e35; font-weight: 600;">Grafik Akumulasi Profil Kulit Menyeluruh</h3>
+            <div style="max-width: 100%; height: 260px; margin-bottom: 25px;">
+                <canvas id="skinChart"></canvas>
+            </div>
+            <div id="recommendation-box"></div>
+        </div>
+    </div>
+
+    <div class="card history-section" style="background: #fff; padding: 25px; border-radius: 16px; border: 1px solid rgba(0,0,0,0.03);">
+        <h3 style="margin-top:0; color:#2c3e35; font-weight: 600;">Jurnal Pemindaian Terakhir</h3>
+        <table style="width: 100%; border-collapse: collapse; text-align: left; font-size: 14px;">
+            <thead>
+                <tr style="border-bottom: 2px solid #e3e8e5;">
+                    <th style="padding: 12px; color: #6b7c74;">Waktu</th>
+                    <th style="padding: 12px; color: #6b7c74;">Hasil Akhir</th>
+                    <th style="padding: 12px; color: #6b7c74;">Oily</th>
+                    <th style="padding: 12px; color: #6b7c74;">Dry</th>
+                    <th style="padding: 12px; color: #6b7c74;">Normal</th>
+                    <th style="padding: 12px; color: #6b7c74;">Combination</th>
+                </tr>
+            </thead>
+            <tbody id="history-table-body">
+                <tr id="empty-history"><td colspan="6" style="padding: 20px; text-align: center; color: #9bb0a5;">Belum ada data pemindaian hari ini.</td></tr>
+            </tbody>
+        </table>
+    </div>
+
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<script>
+    function closeNotifModal() {
+        document.getElementById("notif-modal").style.display = "none";
+    }
+</script>
+
+<script src="{{ url_for('static', filename='js/scanner.js') }}"></script>
+<script src="{{ url_for('static', filename='js/chatbot.js') }}"></script>
+{% endblock %}

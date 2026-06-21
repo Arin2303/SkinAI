@@ -1,0 +1,47 @@
+{% extends "base.html" %}
+
+{% block content %}
+<script>
+    (function() {
+        // Cari semua script yang mengandung 'chatbot' dan matikan
+        const scripts = document.getElementsByTagName('script');
+        for (let i = 0; i < scripts.length; i++) {
+            if (scripts[i].src.includes('chatbot.js')) {
+                scripts[i].parentNode.removeChild(scripts[i]);
+            }
+        }
+    })();
+</script>
+
+<div class="card" style="background: #ffffff; padding: 40px; border-radius: 16px; max-width: 600px; margin: 40px auto; border: 1px solid rgba(0,0,0,0.03);">
+    <h3 style="color: #708238; margin-bottom: 20px;">Kuis Validasi Kulit</h3>
+    <form id="quizForm">
+        <div id="quizContainer">Memuat pertanyaan...</div>
+        <button type="submit" style="margin-top: 20px; background: #708238; color: white; border: none; padding: 12px 25px; border-radius: 8px; cursor: pointer;">
+            Selesai & Lihat Hasil
+        </button>
+    </form>
+</div>
+
+<script>
+    let currentQuestions = [];
+    fetch('/get-questions')
+        .then(res => res.json())
+        .then(data => {
+            if(data.questions) {
+                currentQuestions = data.questions;
+                const container = document.getElementById('quizContainer');
+                container.innerHTML = currentQuestions.map((q, index) => `
+                    <div style="margin-bottom: 25px; text-align: left;">
+                        <p style="font-weight: 600; color: #333;">${index + 1}. ${q.pertanyaan}</p>
+                        ${Object.entries(q.pilihan).map(([key, val]) => `
+                            <label style="display:block; margin: 8px 0; cursor: pointer;">
+                                <input type="radio" name="q${index}" value="${key}" required> ${val}
+                            </label>
+                        `).join('')}
+                    </div>
+                `).join('');
+            }
+        });
+</script>
+{% endblock %}

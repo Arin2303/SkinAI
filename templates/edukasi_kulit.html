@@ -1,0 +1,138 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="dashboard-wrapper" style="display: flex; flex-direction: column; gap: 25px; padding: 20px;">
+    
+    <div class="card" style="background: linear-gradient(135deg, #708238 0%, #859947 100%); padding: 30px; border-radius: 16px; color: white; text-align: center; box-shadow: 0 4px 15px rgba(112,130,56,0.15);">
+        <p style="margin: 0; font-size: 12px; font-weight: 600; letter-spacing: 1.5px; text-transform: uppercase; opacity: 0.9;">Ensiklopedia & Panduan Medis Kulit</p>
+        <h2 style="margin: 5px 0 0 0; font-weight: 800; font-size: 26px;">Edukasi Karakteristik Jenis Kulit</h2>
+    </div>
+
+    <div style="display: flex; gap: 10px; border-bottom: 2px solid #f4f6f0; padding-bottom: 2px; overflow-x: auto;">
+        <button id="tab-Combination" onclick="gantiKategoriKulit('Combination')" style="background: none; border: none; padding: 12px 20px; font-size: 14px; font-weight: 700; color: #708238; border-bottom: 3px solid #708238; cursor: pointer; white-space: nowrap; transition: all 0.2s;">
+            ⚖️ Kombinasi
+        </button>
+        <button id="tab-Oily" onclick="gantiKategoriKulit('Oily')" style="background: none; border: none; padding: 12px 20px; font-size: 14px; font-weight: 600; color: #888; border-bottom: 3px solid transparent; cursor: pointer; white-space: nowrap; transition: all 0.2s;">
+            ✨ Berminyak
+        </button>
+        <button id="tab-Dry" onclick="gantiKategoriKulit('Dry')" style="background: none; border: none; padding: 12px 20px; font-size: 14px; font-weight: 600; color: #888; border-bottom: 3px solid transparent; cursor: pointer; white-space: nowrap; transition: all 0.2s;">
+            🍂 Kering
+        </button>
+        <button id="tab-Normal" onclick="gantiKategoriKulit('Normal')" style="background: none; border: none; padding: 12px 20px; font-size: 14px; font-weight: 600; color: #888; border-bottom: 3px solid transparent; cursor: pointer; white-space: nowrap; transition: all 0.2s;">
+            🌱 Normal
+        </button>
+    </div>
+
+    <div id="konten-edukasi-wraper" style="display: flex; flex-direction: column; gap: 25px;">
+        
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 25px;">
+            
+            <div class="card" style="background: #ffffff; border: 1px solid rgba(0,0,0,0.03); padding: 25px; border-radius: 16px;">
+                <h3 id="edu-judul" style="color: #708238; margin-top: 0; font-weight: 700; font-size: 18px; border-bottom: 2px solid #f4f6f0; padding-bottom: 12px;">-</h3>
+                <p id="edu-pembuka" style="font-size: 14px; color: #555; line-height: 1.6; margin-top: 15px; margin-bottom: 20px;">-</p>
+                
+                <h4 style="color: #333; font-weight: 700; font-size: 14px; margin-bottom: 12px;">💡 Tips Esensial:</h4>
+                <div id="edu-tips-list" style="display: flex; flex-direction: column; gap: 12px;"></div>
+            </div>
+
+            <div class="card" style="background: #ffffff; border: 1px solid rgba(0,0,0,0.03); padding: 25px; border-radius: 16px;">
+                <h3 style="color: #c27d66; margin-top: 0; font-weight: 700; font-size: 18px; border-bottom: 2px solid #f5eadd; padding-bottom: 12px;">⚠️ Pantangan Terbesar</h3>
+                <div id="edu-pantangan-list" style="display: flex; flex-direction: column; gap: 15px; margin-top: 15px;"></div>
+            </div>
+
+        </div>
+
+        <div class="card" style="background: #ffffff; border: 1px solid rgba(0,0,0,0.03); padding: 25px; border-radius: 16px;">
+            <h3 style="color: #708238; margin-top: 0; font-weight: 700; font-size: 18px; margin-bottom: 20px; text-align: center;">🔍 Analisis Mitos vs Fakta</h3>
+            <div id="edu-mitos-fakta-container" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px;"></div>
+        </div>
+
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+let databaseEdukasi = {};
+
+document.addEventListener("DOMContentLoaded", function () {
+    // Muat data ensiklopedia komplit dari backend saat halaman dimuat
+    fetch('/api/edukasi/get-edukasi')
+        .then(response => response.json())
+        .then(res => {
+            if (res.status === "success") {
+                databaseEdukasi = res.edukasi;
+                // Default render kategori pertama: Combination
+                gantiKategoriKulit('Combination');
+            }
+        })
+        .catch(err => console.error("Gagal mengambil data ensiklopedia:", err));
+});
+
+function gantiKategoriKulit(kategori) {
+    const dataAktif = databaseEdukasi[kategori];
+    if (!dataAktif) return;
+
+    // 1. Atur Visual Style Tombol Tab Aktif/Nonaktif
+    const semuaTab = ['Combination', 'Oily', 'Dry', 'Normal'];
+    semuaTab.forEach(tab => {
+        const btn = document.getElementById(`tab-${tab}`);
+        if (tab === kategori) {
+            btn.style.color = "#708238";
+            btn.style.borderBottom = "3px solid #708238";
+            btn.style.fontWeight = "700";
+        } else {
+            btn.style.color = "#888";
+            btn.style.borderBottom = "3px solid transparent";
+            btn.style.fontWeight = "600";
+        }
+    });
+
+    // 2. Render Judul dan Deskripsi Pembuka
+    document.getElementById("edu-judul").textContent = dataAktif.judul;
+    document.getElementById("edu-pembuka").textContent = dataAktif.pembuka;
+
+    // 3. Render Tips List
+    const tipsList = document.getElementById("edu-tips-list");
+    tipsList.innerHTML = "";
+    dataAktif.tips.forEach(text => {
+        const formatted = text.replace(/\*\*(.*?)\*\*/g, '<b>$1</b>');
+        tipsList.innerHTML += `
+            <div style="background: #f4f6f0; padding: 12px 15px; border-radius: 8px; font-size: 13px; color: #4f5d27; line-height: 1.5; border-left: 4px solid #708238;">
+                ${formatted}
+            </div>
+        `;
+    });
+
+    // 4. Render Pantangan List
+    const pantanganList = document.getElementById("edu-pantangan-list");
+    pantanganList.innerHTML = "";
+    dataAktif.pantangan.forEach(p => {
+        pantanganList.innerHTML += `
+            <div style="border-bottom: 1px dashed #f5eadd; padding-bottom: 12px; margin-bottom: 5px;">
+                <h5 style="margin: 0 0 4px 0; color: #c27d66; font-size: 14px; font-weight: 700;">❌ ${p.hal}</h5>
+                <p style="margin: 0; font-size: 12.5px; color: #666; line-height: 1.4;"><span style="font-weight: 600; color: #444;">Alasan:</span> ${p.alasan}</p>
+            </div>
+        `;
+    });
+
+    // 5. Render Mitos vs Fakta
+    const mfContainer = document.getElementById("edu-mitos-fakta-container");
+    mfContainer.innerHTML = "";
+    dataAktif.mitos_fakta.forEach(mf => {
+        mfContainer.innerHTML += `
+            <div style="background: #fafafa; border: 1px solid #f0f0f0; border-radius: 12px; padding: 18px; display: flex; flex-direction: column; gap: 10px;">
+                <div style="background: #fff5f2; border: 1px solid #ffe3db; padding: 10px; border-radius: 8px;">
+                    <span style="font-size: 11px; font-weight: bold; color: #c27d66; text-transform: uppercase; display: block; margin-bottom: 2px;">🔴 MITOS:</span>
+                    <p style="margin: 0; font-size: 13px; color: #666; font-style: italic; line-height: 1.4;">"${mf.mitos}"</p>
+                </div>
+                <div style="background: #f7faf0; border: 1px solid #eaf2d8; padding: 10px; border-radius: 8px;">
+                    <span style="font-size: 11px; font-weight: bold; color: #708238; text-transform: uppercase; display: block; margin-bottom: 2px;">🟢 FAKTA NYATA:</span>
+                    <p style="margin: 0; font-size: 13px; color: #4f5d27; font-weight: 500; line-height: 1.4;">${mf.fakta}</p>
+                </div>
+            </div>
+        `;
+    });
+}
+</script>
+{% endblock %}

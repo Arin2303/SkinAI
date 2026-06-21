@@ -1,0 +1,73 @@
+/* static/css/style.css */
+body {
+    margin: 0;
+    padding: 0;
+    font-family: 'Poppins', sans-serif;
+    display: flex;
+    background-color: #f4f6f0; /* REVISI: Latar belakang menggunakan sage sangat muda */
+    min-height: 100vh;
+}
+
+/* SIDEBAR LAYOUT */
+.sidebar {
+    width: 260px;
+    background: #ffffff;
+    height: 100vh;
+    position: fixed;
+    top: 0; left: 0;
+    border-right: 1px solid #e3e8e5; /* REVISI: Garis tepi soft sage */
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    z-index: 100;
+}
+
+.sidebar-brand { padding: 25px; color: #708238; } /* REVISI: Brand warna Sage Utama */
+.sidebar-brand h2 { margin: 0; font-size: 22px; font-weight: 700; }
+.sidebar-menu { list-style: none; padding: 0; margin: 0; flex-grow: 1; }
+.sidebar-menu li a {
+    display: block;
+    padding: 15px 25px;
+    color: #555;
+    text-decoration: none;
+    font-weight: 500;
+    font-size: 14px;
+    transition: all 0.2s ease;
+}
+.sidebar-menu li a:hover, .sidebar-menu li a.active {
+    background: #f4f6f0; /* REVISI: Hover background soft sage */
+    color: #708238; /* REVISI: Teks aktif Hijau Sage */
+    border-left: 4px solid #708238; /* REVISI: Border aktif Hijau Sage */
+}
+.sidebar-menu li a.disabled { opacity: 0.5; cursor: not-allowed; }
+.sidebar-footer { padding: 20px 25px; border-top: 1px solid #e3e8e5; background: #fafbfa; }
+.sidebar-footer p { margin: 0; font-size: 13px; font-weight: 600; color: #708238; } /* REVISI: Warna nama Kelompok dilaraskan */
+.sidebar-footer span { font-size: 11px; color: #6b7c74; }
+
+/* MAIN CONTENT */
+.main-content { margin-left: 260px; flex-grow: 1; padding: 30px; box-sizing: border-box; }
+.top-header {
+    background: #ffffff; padding: 20px 30px; border-radius: 16px;
+    box-shadow: 0 4px 20px rgba(112,130,56,0.02); margin-bottom: 25px;
+    border: 1px solid #e3e8e5;
+}
+.top-header h1 { margin: 0; font-size: 20px; color: #708238; } /* REVISI: Warna header Utama */
+.top-header p { margin: 5px 0 0 0; font-size: 12px; color: #6b7c74; }
+
+/* ANIMASI LASER SCANNER */
+#scanner-laser {
+    position: absolute;
+    top: 0; left: 0; width: 100%; height: 5px; 
+    background: linear-gradient(90deg, transparent, #c27d66, transparent); /* REVISI: Laser menggunakan aksen Muted Clay */
+    box-shadow: 0 0 15px #c27d66, 0 0 25px #c27d66;
+    z-index: 9999 !important; display: none;
+}
+.camera-wrapper.scanning-active #scanner-laser {
+    display: block !important; 
+    animation: laserMove 2.0s infinite ease-in-out;
+}
+@keyframes laserMove {
+    0% { top: 0%; }
+    50% { top: 95%; }
+    100% { top: 0%; }
+}
