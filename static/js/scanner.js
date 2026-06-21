@@ -20,9 +20,34 @@ let isFrozen = false;
 // Menyimpan data scan kamera sementara di latar belakang (hidden)
 let skorKameraLatarBelakang = null;
 
-// Akses kamera pengguna
-navigator.mediaDevices.getUserMedia({ video: { width: 400, height: 300 } })
-.then(stream => { video.srcObject = stream; })
+// KODE BARU: Mengatur rasio kamera fleksibel untuk HP & Laptop
+const constraints = {
+    video: {
+        width: { ideal: 640 },
+        height: { ideal: 480 },
+        facingMode: "user", // Memastikan menggunakan kamera depan pada HP
+        aspectRatio: { ideal: video.clientWidth / video.clientHeight } // Mengikuti rasio wadah CSS
+    },
+    audio: false
+};
+
+navigator.mediaDevices.getUserMedia(constraints)
+.then(stream => { 
+    video.srcObject = stream; 
+    // Sinkronisasi ukuran canvas secara dinamis saat video mulai berjalan
+    video.onloadedmetadata = () => {
+        canvas.width = video.videoWidth;
+        canvas.height = video.videoHeight;
+
+        const context = canvas.getContext("2d");
+        context.clearRect(0, 0, canvas.width, canvas.height);
+        context.save();
+        context.translate(canvas.width, 0);
+        context.scale(-1, 1);
+        context.drawImage(video, 0, 0, canvas.width, canvas.height);
+        context.restore();
+    };
+})
 .catch(error => {
     console.error("Kamera tidak bisa diakses:", error);
     scoresList.innerHTML = "<li style='color: #d9534f; font-weight:bold;'>⚠️ Akses kamera ditolak browser.</li>";
